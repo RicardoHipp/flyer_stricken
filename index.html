@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stricktreff-Flyer</title>
+
+<!-- Schrift (assets.css), Hintergrundbild (bg-data.js) und die PDF-Schriften
+     (fonts-pdf.js) stecken als data:-URI drin. Alle drei erzeugt
+     tools/embed-assets.py -- nach einem Bildtausch neu laufen lassen. -->
+<link rel="stylesheet" href="assets.css">
+
+<style>
+/* ==========================================================================
+   1. JUSTIERUNG  --  hier und nur hier schrauben, wenn Text verrutscht ist.
+   Alle Werte in Prozent der Flyer-Flaeche. cqw = 1 % der Flyer-BREITE,
+   damit Bildschirm und PDF identisch aussehen.
+   ========================================================================== */
+:root{
+  /* Stoffband unter "Stricktreff" */
+  --band-left:   22.0%;
+  --band-top:    25.5%;
+  --band-width:  56.0%;
+  --band-height:  3.6%;
+  --band-fs:     3.55cqw;   /* Schriftgroesse Bandtext */
+  --band-tilt:  -0.0deg;    /* das Band haengt minimal schief */
+
+  /* Zettel, Ueberschrift -- eigene Flaeche, damit sie von der Terminzahl
+     unberuehrt bleibt. Der Einzug laesst die Waescheklammer frei. */
+  --title-left:  16.4%;
+  --title-top:   70.1%;
+  --title-width: 33.0%;
+  --title-fs:     2.99cqw;
+
+  /* Zettel, Terminliste -- eigene Flaeche. Beginnt unterhalb der Klammer
+     (die endet bei 73 % der Hoehe), damit keine Zeile in sie hineinlaufen kann. */
+  --dates-left:    7.3%;
+  --dates-top:    73.4%;
+  --dates-width:  40.8%;
+  --dates-height: 13.4%;
+  --dates-fs:      2.62cqw;
+
+  /* Farben, dem Original entnommen */
+  --col-band:  #8a5a3b;
+  --col-date:  #241f1b;
+  --col-text:  #35302a;
+  --col-rule:  rgba(90,72,55,.55);
+}
+
+/* ==========================================================================
+   2. DER FLYER
+   ========================================================================== */
+.flyer{
+  position:relative;
+  background:#efe9df;
+  width:100%;
+  aspect-ratio:2/3;
+  container-type:inline-size;          /* macht cqw nutzbar */
+  font-family:'Oswald','Arial Narrow','Franklin Gothic Medium',sans-serif;
+  box-shadow:0 .6rem 2rem rgba(0,0,0,.28);
+  overflow:hidden;
+  print-color-adjust:exact;
+  -webkit-print-color-adjust:exact;
+}
+
+/* Hintergrund als echtes Bild statt als CSS-Hintergrund: so gibt es keine
+   Groessengrenze (Chrome verwirft CSS-Variablen ab etwa einem Megabyte) und
+   es wird auch ohne die Druckoption "Hintergrundgrafiken" mitgedruckt. */
+.flyer-bild{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:fill;
+  user-select:none; -webkit-user-drag:none; pointer-events:none;
+}
+
+/* -- Stoffband ------------------------------------------------------------ */
+.band{
+  position:absolute;
+  left:var(--band-left); top:var(--band-top);
+  width:var(--band-width); height:var(--band-height);
+  display:flex; align-items:center; justify-content:center;
+  transform:rotate(var(--band-tilt));
+  font-size:var(--band-fs);
+  font-weight:600;
+  letter-spacing:.045em;
+  text-transform:uppercase;
+  color:var(--col-band);
+  white-space:nowrap;
+  overflow:hidden;
+  line-height:1;
+}
+
+/* -- Zettel: Ueberschrift und Liste sind zwei voneinander unabhaengige
+      Flaechen. So schrumpft die Ueberschrift nicht mit, wenn viele Termine
+      eingetragen sind, und die Liste kann nicht nach oben in die
+      Waescheklammer wachsen. ------------------------------------------------ */
+.note-title{
+  position:absolute;
+  left:var(--title-left); top:var(--title-top);
+  width:var(--title-width);
+  font-size:var(--title-fs);
+  font-weight:600;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--col-date);
+  line-height:1.1;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.dates{
+  position:absolute;
+  left:var(--dates-left); top:var(--dates-top);
+  width:var(--dates-width); height:var(--dates-height);
+  font-size:var(--dates-fs);
+  color:var(--col-text);
+  /* Drei Spalten: Datum, Ort, Uhrzeit stehen zeilenuebergreifend untereinander.
+     Die letzte Spalte fuellt den Rest, damit die Punktlinien durchlaufen. */
+  display:grid;
+  grid-template-columns:max-content max-content minmax(max-content,1fr);
+  column-gap:var(--dates-gap,.55em);
+  align-content:center; align-items:baseline;
+  list-style:none; margin:0; padding:0;
+  overflow:hidden;
+}
+.dates li{ display:contents; }        /* die Zellen sollen direkt im Raster liegen */
+.dates li > span{
+  padding:var(--dates-pad,.38em) 0;
+  line-height:1.15;
+  white-space:nowrap;
+}
+.dates li + li > span{ border-top:.18cqw dotted var(--col-rule); }
+.dates .d{ font-weight:700; color:var(--col-date); }
+.dates .o,
+.dates .z{ font-weight:400; }
+
+/* Justierhilfe: zeigt die drei Textflaechen an */
+.show-boxes .band,
+.show-boxes .note-title,
+.show-boxes .dates{ outline:1px dashed #d0021b; background:rgba(255,0,0,.07); }
+
+/* ==========================================================================
+   3. BEDIENOBERFLAECHE (im Druck komplett ausgeblendet)
+   ========================================================================== */
+*{box-sizing:border-box}
+body{
+  margin:0; background:#2a2724; color:#eae4dc;
+  font:15px/1.45 "Segoe UI",system-ui,sans-serif;
+}
+.app{ display:flex; gap:1.5rem; align-items:flex-start; padding:1.5rem; }
+.panel{ width:26rem; flex:none; }
+.stage{ flex:1; display:flex; justify-content:center; }
+.stage-inner{ width:min(100%, calc((100vh - 3rem) / 1.5)); }
+
+h1{ font-size:1.15rem; margin:0 0 .2rem; letter-spacing:.02em; }
+.sub{ margin:0 0 1.2rem; color:#a49a8e; font-size:.85rem; }
+fieldset{ border:1px solid #4a453f; border-radius:.5rem; margin:0 0 1rem; padding:.9rem 1rem 1.1rem; }
+legend{ padding:0 .4rem; font-size:.78rem; text-transform:uppercase; letter-spacing:.12em; color:#a49a8e; }
+label{ display:block; font-size:.78rem; color:#a49a8e; margin:.5rem 0 .2rem; }
+input[type=text]{
+  width:100%; padding:.45rem .6rem; border:1px solid #4a453f; border-radius:.3rem;
+  background:#1e1c1a; color:#eae4dc; font:inherit;
+}
+input[type=text]:focus{ outline:2px solid #8a5a3b; outline-offset:0; border-color:transparent; }
+
+.row{ display:grid; grid-template-columns:4.8rem 1fr 6rem auto; gap:.4rem; margin-bottom:.4rem; align-items:center; }
+.row .tools{ display:flex; gap:.15rem; }
+.row button{ padding:.3rem .45rem; line-height:1; }
+.head{ font-size:.7rem; color:#877d72; text-transform:uppercase; letter-spacing:.08em; }
+
+button{
+  background:#3b3833; color:#eae4dc; border:1px solid #56504a; border-radius:.3rem;
+  padding:.5rem .8rem; font:inherit; cursor:pointer;
+}
+button:hover{ background:#4a463f; }
+button.primary{ background:#8a5a3b; border-color:#a06a45; }
+button.primary:hover{ background:#9c6743; }
+.actions{ display:flex; flex-wrap:wrap; gap:.5rem; }
+.hint{ font-size:.75rem; color:#a49a8e; margin:.7rem 0 0; }
+.hint b{ color:#d8ccbd; font-weight:600; }
+.check{ display:flex; align-items:center; gap:.4rem; font-size:.78rem; color:#a49a8e; margin-top:.8rem; }
+.check input{ accent-color:#8a5a3b; }
+
+/* Schmales Fenster: Formular und Vorschau untereinander statt nebeneinander --
+   sonst bleibt fuer die Vorschau nur noch ein Briefmarkenformat uebrig. */
+@media (max-width:52rem){
+  .app{ flex-direction:column; padding:1rem; }
+  .panel{ width:100%; }
+  .stage{ width:100%; }
+  .stage-inner{ width:min(100%, 30rem); }   /* nicht mehr an die Fensterhoehe gekoppelt */
+}
+@media (max-width:30rem){
+  .row{ grid-template-columns:4.4rem 1fr 5rem auto; gap:.3rem; }
+}
+
+/* ==========================================================================
+   4. DRUCK  --  200 x 300 mm, randlos
+   ========================================================================== */
+@page{ size:200mm 300mm; margin:0; }
+@media print{
+  body{ background:#fff; margin:0; }
+  .app{ display:block; padding:0; }
+  .panel{ display:none; }
+  .stage,.stage-inner{ width:100%; display:block; }
+  .stage-inner{ line-height:0; }        /* verhindert eine leere zweite Seite */
+  .flyer{ width:200mm; height:300mm; aspect-ratio:auto; box-shadow:none; }
+  .show-boxes .band,.show-boxes .note-title,.show-boxes .dates{ outline:none; background:none; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="panel">
+    <h1>Stricktreff-Flyer</h1>
+    <p class="sub">Termine eintragen, rechts wandert alles direkt in den Flyer.</p>
+
+    <fieldset>
+      <legend>Stoffband</legend>
+      <label for="bandInput">Zeile unter „Stricktreff“</label>
+      <input type="text" id="bandInput">
+    </fieldset>
+
+    <fieldset>
+      <legend>Zettel</legend>
+      <label for="titleInput">Überschrift</label>
+      <input type="text" id="titleInput">
+
+      <label style="margin-top:.9rem">Termine</label>
+      <div class="row head"><span>Datum</span><span>Ort</span><span>Uhrzeit</span><span></span></div>
+      <div id="rows"></div>
+      <button type="button" id="addRow" style="margin-top:.4rem">+ Termin hinzufügen</button>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" class="primary" id="btnPdf">PDF herunterladen</button>
+      <button type="button" id="btnPrint">Drucken / Als PDF speichern</button>
+      <button type="button" id="btnReset">Zurücksetzen</button>
+    </div>
+
+    <p class="hint">
+      <b>PDF herunterladen</b> braucht keine Einstellungen: der Text kommt als
+      Vektor ins PDF, das Hintergrundbild unverändert im Original.<br>
+      Beim <b>Drucken</b> im Dialog die Ränder auf <b>„Keine“</b> stellen,
+      sonst entstehen weiße Ränder.
+    </p>
+
+    <label class="check"><input type="checkbox" id="boxes"> Textflächen anzeigen (zum Justieren)</label>
+  </aside>
+
+  <main class="stage">
+    <div class="stage-inner">
+      <div class="flyer" id="flyer">
+        <img class="flyer-bild" id="bgBild" alt="">
+        <div class="band"><span id="bandOut"></span></div>
+        <div class="note-title" id="titleOut"></div>
+        <ul class="dates" id="datesOut"></ul>
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<script src="vendor/html2canvas.min.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="bg-data.js"></script>
+<script src="fonts-pdf.js"></script>
+<script>
+(function(){
+"use strict";
+
+const STORE = "stricktreff-flyer-v1";
+
+const VORGABE = {
+  band:  "Jeder 3. Dienstag im Monat",
+  title: "Termine 2025",
+  dates: [
+    { d:"15.09.", o:"Bücherei Stettenhofen", z:"17–20 Uhr" },
+    { d:"20.10.", o:"Bücherei Stettenhofen", z:"17–20 Uhr" },
+    { d:"17.11.", o:"Bücherei Stettenhofen", z:"17–20 Uhr" },
+    { d:"15.12.", o:"Pfarrsaal Stettenhofen", z:"17–20 Uhr" }
+  ]
+};
+
+let daten = laden();
+
+const $ = id => document.getElementById(id);
+const bandInput = $("bandInput"), titleInput = $("titleInput"), rows = $("rows");
+const bandOut = $("bandOut"), titleOut = $("titleOut"), datesOut = $("datesOut");
+const band = document.querySelector(".band");
+
+/* ---------- Speichern / Laden ------------------------------------------- */
+function laden(){
+  try{
+    const roh = localStorage.getItem(STORE);
+    if(roh){
+      const d = JSON.parse(roh);
+      if(d && Array.isArray(d.dates)) return d;
+    }
+  }catch(e){ /* kaputter Eintrag -> Vorgabe */ }
+  return JSON.parse(JSON.stringify(VORGABE));
+}
+function sichern(){
+  try{ localStorage.setItem(STORE, JSON.stringify(daten)); }catch(e){}
+}
+
+/* ---------- Formular ----------------------------------------------------- */
+function formularAufbauen(){
+  rows.innerHTML = "";
+  daten.dates.forEach((t, i) => {
+    const zeile = document.createElement("div");
+    zeile.className = "row";
+    zeile.innerHTML =
+      '<input type="text" data-f="d" placeholder="15.09.">' +
+      '<input type="text" data-f="o" placeholder="Bücherei Stettenhofen">' +
+      '<input type="text" data-f="z" placeholder="17–20 Uhr">' +
+      '<span class="tools">' +
+        '<button type="button" data-a="del" title="Termin löschen">✕</button>' +
+      '</span>';
+
+    zeile.querySelectorAll("input").forEach(inp => {
+      inp.value = t[inp.dataset.f] || "";
+      inp.addEventListener("input", () => {
+        daten.dates[i][inp.dataset.f] = inp.value;
+        zeichnen();
+      });
+    });
+    zeile.querySelector('[data-a="del"]').addEventListener("click", () => {
+      daten.dates.splice(i, 1);
+      formularAufbauen(); zeichnen();
+    });
+    rows.appendChild(zeile);
+  });
+}
+
+function formularFuellen(){
+  bandInput.value = daten.band;
+  titleInput.value = daten.title;
+  formularAufbauen();
+}
+
+bandInput.addEventListener("input", () => { daten.band = bandInput.value; zeichnen(); });
+titleInput.addEventListener("input", () => { daten.title = titleInput.value; zeichnen(); });
+
+$("addRow").addEventListener("click", () => {
+  const letzte = daten.dates[daten.dates.length-1] || {o:"Bücherei Stettenhofen", z:"17–20 Uhr"};
+  daten.dates.push({ d:"", o:letzte.o, z:letzte.z });
+  formularAufbauen(); zeichnen();
+});
+
+$("btnReset").addEventListener("click", () => {
+  if(!confirm("Alle Eingaben auf die Vorgabewerte zurücksetzen?")) return;
+  daten = JSON.parse(JSON.stringify(VORGABE));
+  formularFuellen(); zeichnen();
+});
+
+$("boxes").addEventListener("change", e => {
+  document.body.classList.toggle("show-boxes", e.target.checked);
+});
+
+/* ---------- Flyer zeichnen ---------------------------------------------- */
+function zeichnen(){
+  bandOut.textContent = daten.band;
+  titleOut.textContent = daten.title;
+
+  datesOut.innerHTML = "";
+  daten.dates.forEach(t => {
+    const feld = { d:(t.d||"").trim(), o:(t.o||"").trim(), z:(t.z||"").trim() };
+    if(!feld.d && !feld.o && !feld.z) return;       // ganz leere Zeile wird nicht gedruckt
+    const li = document.createElement("li");
+    li.innerHTML = '<span class="d"></span><span class="o"></span><span class="z"></span>';
+    ["d","o","z"].forEach(k => li.querySelector("." + k).textContent = feld[k]);
+    datesOut.appendChild(li);
+  });
+
+  einpassen();
+  sichern();
+}
+
+/* Schrift so weit verkleinern, bis der Text in seine Flaeche passt.
+   Gerechnet wird in cqw, damit die Vorschau und das PDF gleich aussehen. */
+function einpassen(){
+  passe(band, "--band-fs", () => bandOut.scrollWidth > band.clientWidth + 1);
+  passe(titleOut, "--title-fs", () => titleOut.scrollWidth > titleOut.clientWidth + 1);
+  passeTermine();
+}
+/* Bei vielen Terminen zuerst die Zeilen enger stellen und erst danach die
+   Schrift verkleinern -- eng gesetzt bleibt besser lesbar als winzig. */
+function passeTermine(){
+  const zuHoch  = () => datesOut.scrollHeight > datesOut.clientHeight + 1;   // zu viele Zeilen
+  const zuBreit = () => datesOut.scrollWidth  > datesOut.clientWidth  + 1;   // Spalten zu breit
+
+  datesOut.style.fontSize = "";
+  // Gegen zu viele Zeilen hilft ein engerer Zeilenabstand -- gegen zu breite
+  // Spalten nicht, deshalb haengt dieser Schritt allein an der Hoehe.
+  for(const abstand of [".38em", ".30em", ".24em", ".18em", ".13em", ".09em"]){
+    datesOut.style.setProperty("--dates-pad", abstand);
+    if(!zuHoch()) break;
+  }
+  // Was dann noch nicht passt, ueber die Schriftgroesse loesen.
+  passe(datesOut, "--dates-fs", () => zuHoch() || zuBreit());
+}
+
+function passe(el, cssVar, zuGross){
+  el.style.fontSize = "";                                  // erst zurueck auf Vorgabe
+  const basis = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(cssVar));
+  let k = 1;
+  while(zuGross() && k > 0.30){
+    k -= 0.02;
+    el.style.fontSize = (basis * k).toFixed(3) + "cqw";
+  }
+}
+window.addEventListener("resize", einpassen);
+
+/* ---------- Ausgabe ------------------------------------------------------ */
+$("btnPrint").addEventListener("click", async () => {
+  if(document.fonts && document.fonts.ready) await document.fonts.ready;
+  einpassen();
+  window.print();
+});
+
+/* Das PDF wird NICHT abfotografiert, sondern nachgebaut:
+   - der Hintergrund kommt als Original-JPEG unveraendert hinein (kein Hochrechnen,
+     kein zweites Mal komprimieren),
+   - der Text wird als echter Vektortext gesetzt, mit der eingebetteten Schrift.
+   Geometrie, Groessen und Farben werden dafuer aus der fertig gerenderten
+   Vorschau ausgelesen -- so gibt es nur eine Layout-Quelle, das CSS.
+   Klappt das nicht (z. B. fonts-pdf.js fehlt), wird auf den Bild-Weg zurueckgefallen. */
+
+const MM_JE_PT = 25.4 / 72;
+
+/* Die Grundlinie einer Textzeile exakt bestimmen: ein leerer Inline-Block mit
+   vertical-align:baseline sitzt genau darauf. Das ist verlaesslicher als aus
+   Schriftmetriken zu rechnen -- die weichen je nach Schrift voneinander ab. */
+function grundlinieVon(el){
+  const probe = document.createElement("span");
+  probe.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
+  el.appendChild(probe);
+  const y = probe.getBoundingClientRect().top;
+  probe.remove();
+  return y;
+}
+
+/* Die Bilddaten aus bg-data.js -- dieselben Bytes wie in Hintergrund.jpg. */
+function hintergrundBytes(){
+  return window.FLYER_BG || null;
+}
+
+function farbe(css){
+  const m = css.match(/-?[\d.]+/g) || [0,0,0];
+  return [+m[0], +m[1], +m[2]];
+}
+function grossKlein(text, transform){
+  if(transform === "uppercase") return text.toUpperCase();
+  if(transform === "lowercase") return text.toLowerCase();
+  return text;
+}
+/* Wortweise zeichnen: jedes Wort sitzt exakt dort, wo der Browser es gesetzt hat.
+   Das faengt kleine Unterschiede in der Laufweite zwischen Browser und PDF ab. */
+function woerter(el){
+  const knoten = el.firstChild;
+  if(!knoten || knoten.nodeType !== 3) return [];
+  const roh = knoten.nodeValue, raus = [];
+  let i = 0;
+  while(i < roh.length){
+    if(roh[i] === " "){ i++; continue; }
+    let j = i; while(j < roh.length && roh[j] !== " ") j++;
+    const r = document.createRange(); r.setStart(knoten, i); r.setEnd(knoten, j);
+    raus.push({ text: roh.slice(i, j), rect: r.getBoundingClientRect() });
+    i = j;
+  }
+  return raus;
+}
+
+/* Drehwinkel aus einer CSS-Transformationsmatrix, in Grad, CSS-Richtung
+   (positiv = im Uhrzeigersinn). */
+function drehwinkel(transform){
+  const m = (transform || "").match(/matrix\(([^)]+)\)/);
+  if(!m) return 0;
+  const [a, b] = m[1].split(",").map(parseFloat);
+  return Math.atan2(b, a) * 180 / Math.PI;
+}
+
+function pdfVektor(){
+  if(!window.FLYER_FONTS) throw new Error("fonts-pdf.js nicht geladen");
+  const bild = hintergrundBytes();
+  if(!bild) throw new Error("Hintergrundbild nicht gefunden");
+
+  const flyer = $("flyer");
+  const f = flyer.getBoundingClientRect();
+  const s = 200 / f.width;                       // Millimeter je Bildschirmpixel
+
+  // Das Band haengt leicht schief. Fuer die Messung wird die Drehung kurz
+  // abgeschaltet -- im PDF wird sie dann selbst gerechnet, sonst wuerde man
+  // nur den umschliessenden Kasten der gedrehten Zeile ausmessen.
+  const grad = drehwinkel(getComputedStyle(band).transform);
+  const bandStil = band.style.transform;
+  if(grad) band.style.transform = "none";
+  const bandKasten = band.getBoundingClientRect();
+  const drehpunkt = { x: bandKasten.left + bandKasten.width/2,
+                      y: bandKasten.top  + bandKasten.height/2 };
+  const drehen = (x, y) => {
+    if(!grad) return [x, y];
+    const bog = grad * Math.PI / 180, dx = x - drehpunkt.x, dy = y - drehpunkt.y;
+    return [drehpunkt.x + dx*Math.cos(bog) - dy*Math.sin(bog),
+            drehpunkt.y + dx*Math.sin(bog) + dy*Math.cos(bog)];
+  };
+
+  const pdf = new window.jspdf.jsPDF({ orientation:"portrait", unit:"mm", format:[200,300] });
+  pdf.addImage(bild, "JPEG", 0, 0, 200, 300);    // Originaldatei, unangetastet
+
+  const familien = { 400:"OswaldR", 600:"OswaldSb", 700:"OswaldB" };
+  Object.keys(window.FLYER_FONTS).forEach(g => {
+    pdf.addFileToVFS("Oswald-" + g + ".ttf", window.FLYER_FONTS[g]);
+    pdf.addFont("Oswald-" + g + ".ttf", familien[g], "normal");
+  });
+  const familie = gewicht => familien[Math.round(gewicht/100)*100] || familien[400];
+
+  /* --- Punktlinien zwischen den Terminzeilen ---
+     Die Zeilen selbst haben kein eigenes Kaestchen (display:contents),
+     die Linie laeuft deshalb ueber die volle Breite der Liste. */
+  const listeKasten = datesOut.getBoundingClientRect();
+  [...datesOut.children].slice(1).forEach(li => {
+    const zelle = li.firstElementChild;
+    if(!zelle) return;
+    const cs = getComputedStyle(zelle);
+    const dicke = parseFloat(cs.borderTopWidth);
+    if(!dicke) return;
+    const zr = zelle.getBoundingClientRect();
+    const r = { top: zr.top, left: listeKasten.left, right: listeKasten.right };
+    const y = (r.top - f.top + dicke/2) * s;
+    pdf.setDrawColor(...farbe(cs.borderTopColor));
+    pdf.setLineWidth(dicke * s);
+    pdf.setLineCap("round");
+    pdf.setLineDashPattern([0.001, dicke * s * 2], 0);
+    pdf.line((r.left - f.left) * s, y, (r.right - f.left) * s, y);
+  });
+  pdf.setLineDashPattern([], 0);
+
+  /* --- Text --- */
+  const stuecke = [bandOut, titleOut, ...datesOut.querySelectorAll(".d, .o, .z")];
+  stuecke.forEach(el => {
+    if(!el.textContent.trim()) return;
+    const cs = getComputedStyle(el);
+
+    const grundlinie = grundlinieVon(el);          // Bildschirmpixel
+
+    pdf.setFont(familie(parseInt(cs.fontWeight, 10) || 400), "normal");
+    pdf.setFontSize(parseFloat(cs.fontSize) * s / MM_JE_PT);
+    pdf.setTextColor(...farbe(cs.color));
+    pdf.setCharSpace((parseFloat(cs.letterSpacing) || 0) * s);
+
+    const trans = cs.textTransform;
+    const dreht = band.contains(el) ? grad : 0;
+    woerter(el).forEach(w => {
+      const [px, py] = dreht ? drehen(w.rect.left, grundlinie) : [w.rect.left, grundlinie];
+      pdf.text(grossKlein(w.text, trans),
+               (px - f.left) * s, (py - f.top) * s,
+               { baseline:"alphabetic", angle: -dreht });
+    });
+  });
+
+  pdf.setCharSpace(0);
+  band.style.transform = bandStil;
+  return pdf;
+}
+
+/* Rueckfallebene: der Flyer wird abfotografiert (300 dpi) und als Bild abgelegt. */
+async function pdfBild(){
+  const flyer = $("flyer");
+  const breite = flyer.getBoundingClientRect().width;
+  const canvas = await html2canvas(flyer, {
+    scale: Math.min(6, Math.max(2, 2362 / breite)),
+    backgroundColor: "#ffffff", useCORS: true, logging: false
+  });
+  const pdf = new window.jspdf.jsPDF({ orientation:"portrait", unit:"mm", format:[200,300], compress:true });
+  pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, 200, 300);
+  return pdf;
+}
+
+$("btnPdf").addEventListener("click", async () => {
+  const btn = $("btnPdf"), text = btn.textContent;
+  btn.disabled = true; btn.textContent = "PDF wird erzeugt …";
+  try{
+    if(document.fonts && document.fonts.ready) await document.fonts.ready;
+    einpassen();
+
+    let pdf;
+    try{
+      pdf = pdfVektor();
+    }catch(err){
+      console.warn("Vektor-PDF nicht moeglich, weiche auf den Bild-Weg aus:", err);
+      pdf = await pdfBild();
+    }
+    pdf.save("Stricktreff-Flyer.pdf");
+  }catch(err){
+    console.error(err);
+    alert("Das PDF konnte nicht erzeugt werden:\n" + err +
+          "\n\nBitte stattdessen „Drucken / Als PDF speichern“ benutzen.");
+  }finally{
+    btn.disabled = false; btn.textContent = text;
+  }
+});
+
+/* ---------- Start -------------------------------------------------------- */
+if(window.FLYER_BG) $("bgBild").src = window.FLYER_BG;
+else console.warn("bg-data.js fehlt -- bitte tools/embed-assets.py laufen lassen.");
+formularFuellen();
+zeichnen();
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(einpassen);
+
+})();
+</script>
+</body>
+</html>
