@@ -62,6 +62,8 @@ eingesetzte *Text* ist davon nicht betroffen, der ist immer Vektor.
 
 ## Lizenzen
 
+Dieses Projekt steht unter der [MIT-Lizenz](LICENSE).
+
 Der Generator benutzt drei fremde Bestandteile: **jsPDF** und **html2canvas**
 (beide MIT) und die Schrift **Oswald** (SIL Open Font License 1.1). Alle drei
 sind frei verwendbar; die vollständigen Lizenztexte liegen in `LICENSES/`,
