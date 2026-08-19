@@ -234,15 +234,12 @@ button.primary:hover{ background:#9c6743; }
 
     <div class="actions">
       <button type="button" class="primary" id="btnPdf">PDF herunterladen</button>
-      <button type="button" id="btnPrint">Drucken / Als PDF speichern</button>
       <button type="button" id="btnReset">Zurücksetzen</button>
     </div>
 
     <p class="hint">
-      <b>PDF herunterladen</b> braucht keine Einstellungen: der Text kommt als
-      Vektor ins PDF, das Hintergrundbild unverändert im Original.<br>
-      Beim <b>Drucken</b> im Dialog die Ränder auf <b>„Keine“</b> stellen,
-      sonst entstehen weiße Ränder.
+      Der Text kommt als Vektor ins PDF, das Hintergrundbild unverändert im
+      Original — 200 × 300 mm, randlos.
     </p>
 
     <label class="check"><input type="checkbox" id="boxes"> Textflächen anzeigen (zum Justieren)</label>
@@ -413,12 +410,6 @@ function passe(el, cssVar, zuGross){
 window.addEventListener("resize", einpassen);
 
 /* ---------- Ausgabe ------------------------------------------------------ */
-$("btnPrint").addEventListener("click", async () => {
-  if(document.fonts && document.fonts.ready) await document.fonts.ready;
-  einpassen();
-  window.print();
-});
-
 /* Das PDF wird NICHT abfotografiert, sondern nachgebaut:
    - der Hintergrund kommt als Original-JPEG unveraendert hinein (kein Hochrechnen,
      kein zweites Mal komprimieren),

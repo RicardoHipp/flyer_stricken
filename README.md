@@ -7,14 +7,13 @@ Browser gespeichert, beim nächsten Öffnen ist alles wieder da.
 
 ## PDF
 
-| Button | was passiert |
-|---|---|
-| **PDF herunterladen** | landet direkt im Download-Ordner, keine Einstellungen nötig. |
-| **Drucken / Als PDF speichern** | Druckdialog, dort Ziel „Als PDF speichern". Einmalig einstellen: **Ränder = Keine**. |
-
-Beide Wege liefern eine Seite **200 × 300 mm**, randlos — das Seitenverhältnis der
+**PDF herunterladen** legt die fertige Datei im Download-Ordner ab, ohne
+Rückfragen. Eine Seite **200 × 300 mm**, randlos — das Seitenverhältnis der
 Vorlage. Auf A4 gedruckt bleibt oben und unten ein schmaler weißer Rand; wer A4
 randfüllend braucht, sagt Bescheid.
+
+(Strg+P funktioniert weiterhin und setzt dieselbe Seite; im Dialog dann die
+Ränder auf „Keine" stellen.)
 
 Der Download rastert den Flyer **nicht** ab, sondern baut das PDF nach:
 `Hintergrund.jpg` wird Byte für Byte unverändert eingebettet (kein Hochrechnen,
@@ -47,7 +46,7 @@ Bild und CSS trotzdem neu gebaut).
 
 Die Vorlage hat 1684 × 2528 px, auf 200 mm sind das rund 214 dpi — für Aushang
 und Digitaldruck gut. Das Bild kann nie schärfer werden als die Datei; der
-eingesetzte *Text* ist davon nicht betroffen, der ist bei beiden Wegen Vektor.
+eingesetzte *Text* ist davon nicht betroffen, der ist immer Vektor.
 
 ## Dateien
 
