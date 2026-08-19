@@ -40,10 +40,13 @@
   --dates-height: 13.4%;
   --dates-fs:      2.62cqw;
 
-  /* Farben, dem Original entnommen */
-  --col-band:  #8a5a3b;
-  --col-date:  #241f1b;
-  --col-text:  #35302a;
+  /* Tinte. Leicht durchscheinend und waermer als reines Schwarz, damit die
+     Buchstaben im Papier zu liegen scheinen statt darauf zu kleben.
+     --ink-opacity gilt fuer Bildschirm und PDF gleichermassen. */
+  --ink-opacity: .90;
+  --col-band:  #8f603f;
+  --col-date:  #3b3128;
+  --col-text:  #4a4036;
   --col-rule:  rgba(90,72,55,.55);
 }
 
@@ -88,6 +91,7 @@
   white-space:nowrap;
   overflow:hidden;
   line-height:1;
+  opacity:var(--ink-opacity);
 }
 
 /* -- Zettel: Ueberschrift und Liste sind zwei voneinander unabhaengige
@@ -106,6 +110,7 @@
   line-height:1.1;
   white-space:nowrap;
   overflow:hidden;
+  opacity:var(--ink-opacity);
 }
 .dates{
   position:absolute;
@@ -121,6 +126,7 @@
   align-content:center; align-items:baseline;
   list-style:none; margin:0; padding:0;
   overflow:hidden;
+  opacity:var(--ink-opacity);
 }
 .dates li{ display:contents; }        /* die Zellen sollen direkt im Raster liegen */
 .dates li > span{
@@ -441,6 +447,21 @@ function farbe(css){
   const m = css.match(/-?[\d.]+/g) || [0,0,0];
   return [+m[0], +m[1], +m[2]];
 }
+/* Alphawert einer CSS-Farbe (rgba) -- jsPDF faerbt ohne Alpha, das muss ueber
+   den Grafikzustand kommen. */
+function alpha(css){
+  const m = css.match(/-?[\d.]+/g);
+  return m && m.length > 3 ? +m[3] : 1;
+}
+/* Wirksame Deckkraft eines Elements: alle Ebenen bis zum Flyer aufmultipliziert. */
+function deckkraft(el, bis){
+  let wert = 1;
+  for(let n = el; n && n !== bis; n = n.parentElement){
+    const o = parseFloat(getComputedStyle(n).opacity);
+    if(Number.isFinite(o)) wert *= o;
+  }
+  return wert;
+}
 function grossKlein(text, transform){
   if(transform === "uppercase") return text.toUpperCase();
   if(transform === "lowercase") return text.toLowerCase();
@@ -520,6 +541,9 @@ function pdfVektor(){
     const zr = zelle.getBoundingClientRect();
     const r = { top: zr.top, left: listeKasten.left, right: listeKasten.right };
     const y = (r.top - f.top + dicke/2) * s;
+    // Die Linienfarbe traegt ihr Alpha in sich, dazu kommt die Deckkraft der
+    // Liste -- jsPDF faerbt ohne Alpha, beides muss in den Grafikzustand.
+    pdf.setGState(new pdf.GState({ opacity: alpha(cs.borderTopColor) * deckkraft(zelle, flyer) }));
     pdf.setDrawColor(...farbe(cs.borderTopColor));
     pdf.setLineWidth(dicke * s);
     pdf.setLineCap("round");
@@ -527,6 +551,7 @@ function pdfVektor(){
     pdf.line((r.left - f.left) * s, y, (r.right - f.left) * s, y);
   });
   pdf.setLineDashPattern([], 0);
+  pdf.setGState(new pdf.GState({ opacity: 1 }));
 
   /* --- Text --- */
   const stuecke = [bandOut, titleOut, ...datesOut.querySelectorAll(".d, .o, .z")];
@@ -540,6 +565,8 @@ function pdfVektor(){
     pdf.setFontSize(parseFloat(cs.fontSize) * s / MM_JE_PT);
     pdf.setTextColor(...farbe(cs.color));
     pdf.setCharSpace((parseFloat(cs.letterSpacing) || 0) * s);
+    // Leicht durchscheinende Tinte -- derselbe Wert wie in der Vorschau.
+    pdf.setGState(new pdf.GState({ opacity: alpha(cs.color) * deckkraft(el, flyer) }));
 
     const trans = cs.textTransform;
     const dreht = band.contains(el) ? grad : 0;
@@ -552,6 +579,7 @@ function pdfVektor(){
   });
 
   pdf.setCharSpace(0);
+  pdf.setGState(new pdf.GState({ opacity: 1 }));
   band.style.transform = bandStil;
   return pdf;
 }
