@@ -46,7 +46,9 @@ def b64(daten: bytes) -> str:
 
 
 def css_bauen() -> None:
-    teile = ["/* Automatisch erzeugt von tools/embed-assets.py -- nicht von Hand aendern. */\n"]
+    teile = ["/* Automatisch erzeugt von tools/embed-assets.py -- nicht von Hand aendern.\n"
+             "   Enthaelt Oswald, Copyright 2016 The Oswald Project Authors,\n"
+             "   SIL Open Font License 1.1 -- siehe LICENSES/Oswald-OFL-1.1.txt */\n"]
 
     if WOFF2.exists():
         teile.append(
@@ -103,7 +105,10 @@ def schriften_bauen() -> None:
 
     OUT_JS.write_text(
         "// Automatisch erzeugt von tools/embed-assets.py -- nicht von Hand aendern.\n"
-        "// Oswald (SIL Open Font License) als TrueType, Base64 -- fuer den PDF-Export.\n"
+        "// Oswald als TrueType, Base64 -- fuer den PDF-Export. Auf feste Strichstaerken\n"
+        "// festgezurrt und auf die benoetigten Zeichen gekuerzt.\n"
+        "// Copyright 2016 The Oswald Project Authors, SIL Open Font License 1.1\n"
+        "// -- siehe LICENSES/Oswald-OFL-1.1.txt\n"
         "window.FLYER_FONTS = " + json.dumps(schriften) + ";\n",
         encoding="utf-8",
     )

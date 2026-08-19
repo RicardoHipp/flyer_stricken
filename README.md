@@ -59,3 +59,13 @@ eingesetzte *Text* ist davon nicht betroffen, der ist immer Vektor.
 - `tools/oswald-latin.woff2` — Schriftquelle (SIL Open Font License)
 - `vendor/` — jsPDF, dazu html2canvas für die Rückfallebene
 - `Hintergrund.jpg` — Vorlage
+
+## Lizenzen
+
+Der Generator benutzt drei fremde Bestandteile: **jsPDF** und **html2canvas**
+(beide MIT) und die Schrift **Oswald** (SIL Open Font License 1.1). Alle drei
+sind frei verwendbar; die vollständigen Lizenztexte liegen in `LICENSES/`,
+die Übersicht dazu in [THIRD-PARTY.md](THIRD-PARTY.md).
+
+`Hintergrund.jpg` ist davon **nicht** erfasst — was mit dem Flyer-Motiv erlaubt
+ist, regelt die Vereinbarung mit dem Urheber, siehe THIRD-PARTY.md.
