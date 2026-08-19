@@ -33,18 +33,17 @@ lassen.
 
 ## Die Vorlagengrafik
 
-`Hintergrund.jpg` ist keine fremde Bibliothek: das Motiv wurde mit einem
-KI-Bildgenerator erzeugt, es steckt also kein fremdes Stockfoto darin, dessen
-Lizenz der Weitergabe im Wege stünde.
+`Hintergrund.jpg` ist keine fremde Bibliothek: das Motiv wurde mit **Google
+Gemini** erzeugt. Es steckt also kein fremdes Stockfoto darin, dessen Lizenz
+der Weitergabe im Wege stünde. Google beansprucht an erzeugten Bildern kein
+Eigentum und erlaubt auch die kommerzielle Nutzung.
 
-Zwei Dinge sind trotzdem erwähnenswert:
+Zwei Randnotizen ohne Handlungsbedarf:
 
 - Rein KI-erzeugte Bilder gelten in Deutschland mangels persönlicher geistiger
-  Schöpfung (§ 2 Abs. 2 UrhG) in aller Regel als **nicht urheberrechtlich
-  geschützt**. Für die Nutzung hier ist das folgenlos — es heißt aber auch, dass
-  sich Dritte an dem Motiv bedienen dürfen, sobald es öffentlich liegt.
-- Maßgeblich bleiben die Nutzungsbedingungen des verwendeten Generators. Die
-  meisten (ChatGPT/DALL·E, Adobe Firefly, Midjourney im Bezahltarif, Ideogram)
-  räumen die kommerzielle Nutzung ein. Ausnahmen, bei denen ein Blick lohnt:
-  der Bing/Copilot Image Creator erlaubt nur private, nicht-kommerzielle
-  Nutzung, und Canva Magic Media untersagt die Weitergabe der reinen Bilddatei.
+  Schöpfung (§ 2 Abs. 2 UrhG) in aller Regel als nicht urheberrechtlich
+  geschützt. Folgenlos für die Nutzung hier — es heißt aber auch, dass sich
+  Dritte an dem Motiv bedienen dürfen, sobald es öffentlich liegt.
+- Google versieht erzeugte Bilder mit SynthID, einer unsichtbaren Markierung.
+  Die Datei ist damit maschinell als KI-erzeugt erkennbar; für einen
+  Aushang-Flyer spielt das keine Rolle.
