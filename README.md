@@ -67,5 +67,5 @@ Der Generator benutzt drei fremde Bestandteile: **jsPDF** und **html2canvas**
 sind frei verwendbar; die vollständigen Lizenztexte liegen in `LICENSES/`,
 die Übersicht dazu in [THIRD-PARTY.md](THIRD-PARTY.md).
 
-`Hintergrund.jpg` ist davon **nicht** erfasst — was mit dem Flyer-Motiv erlaubt
-ist, regelt die Vereinbarung mit dem Urheber, siehe THIRD-PARTY.md.
+`Hintergrund.jpg` ist davon nicht erfasst: das Motiv ist KI-erzeugt, enthält
+also kein fremdes Stockmaterial. Details in THIRD-PARTY.md.

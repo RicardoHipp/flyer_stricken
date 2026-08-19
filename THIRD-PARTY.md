@@ -31,10 +31,20 @@ Nicht ausgeliefert und deshalb hier ohne Belang: `fonttools` und `brotli`
 (beide MIT) werden nur lokal gebraucht, um `tools/embed-assets.py` laufen zu
 lassen.
 
-## Nicht abgedeckt: die Vorlagengrafik
+## Die Vorlagengrafik
 
-`Hintergrund.jpg` ist keine freie Bibliothek, sondern das gestaltete Flyer-Motiv.
-Was damit erlaubt ist, richtet sich nach der Vereinbarung mit dem Urheber bzw.
-nach der Lizenz der darin verwendeten Stockfotos — und nicht nach diesem
-Dokument. Das gilt besonders, weil die Datei in diesem öffentlichen Repository
-für jeden herunterladbar ist.
+`Hintergrund.jpg` ist keine fremde Bibliothek: das Motiv wurde mit einem
+KI-Bildgenerator erzeugt, es steckt also kein fremdes Stockfoto darin, dessen
+Lizenz der Weitergabe im Wege stünde.
+
+Zwei Dinge sind trotzdem erwähnenswert:
+
+- Rein KI-erzeugte Bilder gelten in Deutschland mangels persönlicher geistiger
+  Schöpfung (§ 2 Abs. 2 UrhG) in aller Regel als **nicht urheberrechtlich
+  geschützt**. Für die Nutzung hier ist das folgenlos — es heißt aber auch, dass
+  sich Dritte an dem Motiv bedienen dürfen, sobald es öffentlich liegt.
+- Maßgeblich bleiben die Nutzungsbedingungen des verwendeten Generators. Die
+  meisten (ChatGPT/DALL·E, Adobe Firefly, Midjourney im Bezahltarif, Ideogram)
+  räumen die kommerzielle Nutzung ein. Ausnahmen, bei denen ein Blick lohnt:
+  der Bing/Copilot Image Creator erlaubt nur private, nicht-kommerzielle
+  Nutzung, und Canva Magic Media untersagt die Weitergabe der reinen Bilddatei.
